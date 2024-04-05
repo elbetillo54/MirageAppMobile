@@ -1,23 +1,41 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useCallback } from 'react';
 import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity, SectionList } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import FirebaseContext from '../context/firebase/firebaseContext';
+import PedidoContext from '../context/pedidos/pedidosContext';
+import DetallePlatillo from './DetallePlatillo';
 
 const Menu = () => {
-    // Contexto de Firebase
     const { menu, obtenerProductos } = useContext(FirebaseContext);
-    // Estado para almacenar la categoría seleccionada
+    const { seleccionarPlatillo } = useContext(PedidoContext);
+    const navigation = useNavigation();
     const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
 
     useEffect(() => {
         obtenerProductos();
     }, []);
 
-    // Filtrar los artículos según la categoría seleccionada
-    const articulosFiltrados = categoriaSeleccionada
-        ? menu.filter(articulo => articulo.categoria === categoriaSeleccionada)
-        : menu;
+    const handleItemPress = useCallback((item) => {
+        const { existencia, ...platillo2 } = item;
+        seleccionarPlatillo(platillo2);
+        navigation.navigate("DetallePlatillo");
+    }, [navigation, seleccionarPlatillo]);
 
-    // Agrupar los artículos por categoría para la SectionList
+    const renderItem = useCallback(({ item }) => (
+        <TouchableOpacity onPress={() => handleItemPress(item)}>
+            <View style={styles.articuloContainer}>
+                <Image source={{ uri: item.imagen }} style={styles.imagen} />
+                <View style={styles.textContainer}>
+                    <Text style={styles.nombre}>{item.nombre}</Text>
+                    <Text style={styles.precio}>Precio: {item.precio}$</Text>
+                    <Text style={styles.categoria}>Categoría: {item.categoria}</Text>
+                </View>
+            </View>
+        </TouchableOpacity>
+    ), [handleItemPress]);
+
+    const articulosFiltrados = categoriaSeleccionada ? menu.filter(articulo => articulo.categoria === categoriaSeleccionada) : menu;
+    
     const data = articulosFiltrados.reduce((acc, articulo) => {
         if (!acc[articulo.categoria]) {
             acc[articulo.categoria] = [];
@@ -26,9 +44,8 @@ const Menu = () => {
         return acc;
     }, {});
 
-    // Convertir el objeto agrupado en un array de secciones
     const secciones = Object.keys(data)
-        .sort() // Ordenar las claves (categorías) alfabéticamente
+        .sort()
         .map(categoria => ({
             title: categoria,
             data: data[categoria],
@@ -38,19 +55,10 @@ const Menu = () => {
         <SectionList
             sections={secciones}
             keyExtractor={(item, index) => item.id}
-            renderItem={({ item }) => (
-                <View style={styles.articuloContainer} key={item.id}>
-                    <Image source={{ uri: item.imagen }} style={styles.imagen} />
-                    <View style={styles.textContainer}>
-                        <Text style={styles.nombre}>{item.nombre}</Text>
-                        <Text style={styles.precio}>Precio: {item.precio}</Text>
-                        <Text style={styles.categoria}>Categoría: {item.categoria}</Text>
-                    </View>
-                </View>
-            )}
+            renderItem={renderItem}
             renderSectionHeader={({ section: { title } }) => (
                 <View style={styles.separadorContainer}>
-                    <Text style={styles.separador}>{title}</Text>
+                    <Text style={styles.separador}>{title.toUpperCase()}</Text>
                 </View>
             )}
         />
@@ -59,16 +67,16 @@ const Menu = () => {
 
 const styles = StyleSheet.create({
     articuloContainer: {
-        marginLeft: "auto", //Centro de la izquierda
-        marginRight:"auto", //Centro de la derecha 
-        flex: 1, 
-        width: '90%', 
+        marginLeft: "auto",
+        marginRight: "auto",
+        flex: 1,
+        width: '90%',
         flexDirection: 'row',
         alignItems: 'center',
         padding: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
-        marginBottom: 2,
+        marginBottom: 4,
         backgroundColor: "white",
         borderRadius: 10,
         marginTop: 3
@@ -81,7 +89,6 @@ const styles = StyleSheet.create({
     },
     textContainer: {
         flex: 1,
-        
     },
     nombre: {
         fontSize: 18,
@@ -91,10 +98,12 @@ const styles = StyleSheet.create({
     precio: {
         fontSize: 16,
         color: 'black',
+        fontWeight: "bold"
     },
     categoria: {
         fontSize: 16,
         color: 'black',
+        fontWeight: "bold"
     },
     separadorContainer: {
         backgroundColor: '#eee',
@@ -104,7 +113,7 @@ const styles = StyleSheet.create({
     separador: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: "#000"
+        color: "#000",
     },
 });
 
