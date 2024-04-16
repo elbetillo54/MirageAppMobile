@@ -27,7 +27,7 @@ const Menu = () => {
                 <Image source={{ uri: item.imagen }} style={styles.imagen} />
                 <View style={styles.textContainer}>
                     <Text style={styles.nombre}>{item.nombre}</Text>
-                    <Text style={styles.precio}>Precio: {item.precio}$</Text>
+                    <Text style={styles.precio}>Precio: ${item.precio}</Text>
                     <Text style={styles.categoria}>Categoría: {item.categoria}</Text>
                 </View>
             </View>

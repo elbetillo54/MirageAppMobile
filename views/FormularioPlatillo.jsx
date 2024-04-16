@@ -103,7 +103,7 @@ const FormularioPlatillo = () => {
     </View>
 
     <View style={styles.totalContainer}>
-      <Text style={styles.totalText}>Subtotal: {total}$</Text>
+      <Text style={styles.totalText}>Subtotal: ${total}</Text>
     </View>
 
     <View style= {styles.botonContainer}>
@@ -134,7 +134,6 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: 'bold',
     color:"black"
-    
   },
   counterText: {
     fontSize: 24,
@@ -143,7 +142,6 @@ const styles = StyleSheet.create({
     color: "black",
   },
   totalContainer: {
-
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

@@ -56,6 +56,7 @@ const ResumenPedido = () => {
                 console.log(nuevoCom);
                 
                 await referencia.update({ comentarios: nuevoCom})
+                await referencia.update({ completado: false})
 
                 // Recalcular el nuevo total
                 const calcularTotalFinal = (productos) => {
@@ -172,7 +173,7 @@ const ResumenPedido = () => {
                     <Image source={{ uri: platillo.imagen }} style={styles.imagen} />
                     <View style={styles.platilloInfo}>
                         <Text style={styles.platilloNombre}>{platillo.nombre}</Text>
-                        <Text style={styles.platilloPrecio}>Precio: {platillo.precio}$</Text>
+                        <Text style={styles.platilloPrecio}>Precio: ${platillo.precio}</Text>
                         <Text style={styles.platilloCantidad}>Cantidad: {platillo.count}</Text>
                         <Pressable style={styles.eliminar} onPress={() => eliminarProducto(platillo.id)}>
                             <Text style={[styles.textoboton, { fontSize: 15 }]}>Eliminar</Text>
